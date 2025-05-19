@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class BoardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "seq", nullable = false)
-    private Integer id;
+    private Integer seq;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
@@ -25,22 +26,19 @@ public class BoardEntity {
     @Column(name = "writer", nullable = false, length = 50)
     private String writer;
 
-    @Lob
     @Column(name = "contents", nullable = false)
     private String contents;
 
-    @ColumnDefault("0")
     @Column(name = "read_count")
     private Integer readCount;
 
-    @ColumnDefault("current_timestamp()")
     @Column(name = "create_date")
-    private Instant createDate;
+    private LocalDateTime createDate;
 
     @Column(name = "update_date")
-    private Instant updateDate;
+    private LocalDateTime updateDate;
 
-    @OneToMany(mappedBy = "boardSeq")
+    @OneToMany(mappedBy = "board")
     private Set<BoardFileEntity> boardFiles = new LinkedHashSet<>();
 
 }

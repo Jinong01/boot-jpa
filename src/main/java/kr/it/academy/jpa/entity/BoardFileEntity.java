@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,8 +16,7 @@ public class BoardFileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "seq", nullable = false)
-    private Integer id;
-
+    private Integer seq;
 
     @Column(name = "file_name", nullable = false, length = 100)
     private String fileName;
@@ -27,11 +27,10 @@ public class BoardFileEntity {
     @Column(name = "file_path", nullable = false, length = 200)
     private String filePath;
 
-    @ColumnDefault("current_timestamp()")
     @Column(name = "create_date")
-    private Instant createDate;
+    private LocalDateTime createDate;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "board_seq", nullable = false)
-    private BoardEntity boardSeq;
+    private BoardEntity board;
 }

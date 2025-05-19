@@ -1,16 +1,18 @@
 package kr.it.academy.jpa.service;
 
+import kr.it.academy.jpa.dto.BoardDto;
 import kr.it.academy.jpa.entity.BoardEntity;
 import kr.it.academy.jpa.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,14 +20,34 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
-    public Map<String, Object> getBoardList(@RequestParam(name = "currentPage",defaultValue = "0")
-                                            int currentPage) {
+    @Transactional(readOnly = true)
+    public Map<String, Object> getBoardList(Pageable pageable) {
+        Map<String, Object> map = new HashMap<>();
+        Page<BoardEntity> boardPage = boardRepository.findAll(pageable);
 
-        Pageable pageable = PageRequest.of(currentPage, 10, Sort.Direction.DESC, "boardId");
-        Map<String, Object> map = new HashMap<String, Object>();
+        List<BoardDto> boardDtoList =
+                boardPage.getContent().stream().map(BoardDto::of).collect(Collectors.toList());
 
-        Page<BoardEntity> boardList = boardRepository.findAll(pageable);
+        map.put("total", boardPage.getTotalElements());
+        map.put("boardList", boardDtoList);
+        map.put("page", boardPage.getNumber());
 
+        return map;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> searchBoards(Pageable pageable, Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
+        String title = params.get("title").toString();
+        System.out.println(title);
+        Page<BoardEntity> boardPage = boardRepository.findByTitleContaining(pageable, title);
+
+        List<BoardDto> boardDtoList =
+                boardPage.getContent().stream().map(BoardDto::of).collect(Collectors.toList());
+        System.out.println(boardDtoList);
+        map.put("total", boardPage.getTotalElements());
+        map.put("boardList", boardDtoList);
+        map.put("page", boardPage.getNumber());
 
         return map;
     }
